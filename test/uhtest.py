@@ -22,77 +22,77 @@ import uh
 
 
 class Test_UHArguments(unittest.TestCase):
-	"""
-	Test the UHArguments class. Verifying the defaults is enough.
-	Checking getters and setter is probably overkill.
-	"""
+    """
+    Test the UHArguments class. Verifying the defaults is enough.
+    Checking getters and setter is probably overkill.
+    """
 
-	def setUp(self):
-		self.uh_args = uh.UHArguments()
+    def setUp(self):
+        self.uh_args = uh.UHArguments()
 
-	def testinit(self):
-		self.assertTrue(self.uh_args.header_filename == None)
-		self.assertTrue(self.uh_args.searchdir == ".")
-	
-	def testset(self):
-		self.uh_args.header_filename = "foo.h"
-		self.uh_args.searchdir = "/"
+    def testinit(self):
+        self.assertTrue(self.uh_args.header_filename == None)
+        self.assertTrue(self.uh_args.searchdir == ".")
+    
+    def testset(self):
+        self.uh_args.header_filename = "foo.h"
+        self.uh_args.searchdir = "/"
 
-		self.assertTrue(self.uh_args.header_filename == "foo.h")
-		self.assertTrue(self.uh_args.searchdir == "/")
+        self.assertTrue(self.uh_args.header_filename == "foo.h")
+        self.assertTrue(self.uh_args.searchdir == "/")
 
 
 class Test_handle_cmdline(unittest.TestCase):
-	"""
-	Test the handle_cmdline function.
-	"""
+    """
+    Test the handle_cmdline function.
+    """
 
-	def test_toomanyargs(self):
-		sys.argv.append("bar.h")
-		sys.argv.append("/")
-		sys.argv.append("aaa")
+    def test_toomanyargs(self):
+        sys.argv.append("bar.h")
+        sys.argv.append("/")
+        sys.argv.append("aaa")
 
-		(options, args, err) = uh.handle_cmdline()
+        (options, args, err) = uh.handle_cmdline()
 
-		self.assertTrue(err)
-		self.assertTrue(err == uh.BAD_ARGS)
+        self.assertTrue(err)
+        self.assertTrue(err == uh.BAD_ARGS)
 
-	def test_toofewargs(self):
-		(options, args, err) = uh.handle_cmdline()
+    def test_toofewargs(self):
+        (options, args, err) = uh.handle_cmdline()
 
-		self.assertTrue(err)
-		self.assertTrue(err == uh.BAD_ARGS)
+        self.assertTrue(err)
+        self.assertTrue(err == uh.BAD_ARGS)
 
-	def test_defaults(self):
-		sys.argv.append("bam.h")
+    def test_defaults(self):
+        sys.argv.append("bam.h")
 
-		(options, args, err) = uh.handle_cmdline()
+        (options, args, err) = uh.handle_cmdline()
 
-		self.assertFalse(err)
-		self.assertFalse(options.do_rename)
-		self.assertTrue(args.header_filename == "bam.h")
-		self.assertTrue(args.searchdir == ".")
+        self.assertFalse(err)
+        self.assertFalse(options.do_rename)
+        self.assertTrue(args.header_filename == "bam.h")
+        self.assertTrue(args.searchdir == ".")
 
-	def test_do_renameflag(self):
-		sys.argv.append("-r")
-		sys.argv.append("baz.h")
+    def test_do_renameflag(self):
+        sys.argv.append("-r")
+        sys.argv.append("baz.h")
 
-		(options, args, err) = uh.handle_cmdline()
+        (options, args, err) = uh.handle_cmdline()
 
-		self.assertFalse(err)
-		self.assertTrue(options.do_rename)
-		self.assertTrue(args.header_filename == "baz.h")
-		self.assertTrue(args.searchdir == ".")
+        self.assertFalse(err)
+        self.assertTrue(options.do_rename)
+        self.assertTrue(args.header_filename == "baz.h")
+        self.assertTrue(args.searchdir == ".")
 
-	def tearDown(self):
-		"""
-		Clean out the cmd line arguments after each run. uhtest.py
-		should be all that is left.
-		"""
-		while( len(sys.argv) > 1):
-			sys.argv.pop()
+    def tearDown(self):
+        """
+        Clean out the cmd line arguments after each run. uhtest.py
+        should be all that is left.
+        """
+        while( len(sys.argv) > 1):
+            sys.argv.pop()
 
 
 
 if __name__ == '__main__':
-	unittest.main()
+    unittest.main()

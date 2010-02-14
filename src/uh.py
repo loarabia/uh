@@ -26,64 +26,64 @@ BAD_ARGS = 1
 
 
 def main():
-	pass
+    pass
 
 
 def handle_cmdline():
-	"""
-	Parses the commandline arguments and flags and provides usage
-	information.
-	
-	Returns a tuple of (options,UHArgumentsInstance, errorCode)
-	"""
-	uh_args = UHArguments()
-	error = NO_ERROR 
+    """
+    Parses the commandline arguments and flags and provides usage
+    information.
+    
+    Returns a tuple of (options,UHArgumentsInstance, errorCode)
+    """
+    uh_args = UHArguments()
+    error = NO_ERROR 
 
-	parser = OptionParser(USAGE)
-	parser.add_option("-r","--rename",
-			action="store_true",
-			dest="do_rename",
-			default=False,
-			help="renames the headers prompting for each")
+    parser = OptionParser(USAGE)
+    parser.add_option("-r","--rename",
+            action="store_true",
+            dest="do_rename",
+            default=False,
+            help="renames the headers prompting for each")
 
-	(options, cmdline_args) = parser.parse_args()
+    (options, cmdline_args) = parser.parse_args()
 
-	if len(cmdline_args)== 2:
-		uh_args.header_filename = cmdline_args[0]
-		uh_args.searchdir = cmdline_args[1]
-	elif len(cmdline_args) == 1:
-		uh_args.header_filename = cmdline_args[0]
-	else:
-		# Only emit parse errors and exit if you're running as the
-		# main module. Otherwise, we expect that this module is being
-		# used elsewhere (such as a test suite) or as part of another
-		# application and they may want to handle their own errors.
-		if __name__ == '__main__':
-			parser.error("Error: must specify 1 or 2 arguments")
-		else:
-			error = BAD_ARGS 
+    if len(cmdline_args)== 2:
+        uh_args.header_filename = cmdline_args[0]
+        uh_args.searchdir = cmdline_args[1]
+    elif len(cmdline_args) == 1:
+        uh_args.header_filename = cmdline_args[0]
+    else:
+        # Only emit parse errors and exit if you're running as the
+        # main module. Otherwise, we expect that this module is being
+        # used elsewhere (such as a test suite) or as part of another
+        # application and they may want to handle their own errors.
+        if __name__ == '__main__':
+            parser.error("Error: must specify 1 or 2 arguments")
+        else:
+            error = BAD_ARGS 
 
-	return (options, uh_args, error)
+    return (options, uh_args, error)
 
 
 class UHArguments:
-	"""
-	This is purely a data container which provides a clearer way to pass
-	arguments from the parser to the main function.
-	"""
+    """
+    This is purely a data container which provides a clearer way to pass
+    arguments from the parser to the main function.
+    """
 
-	def __init__(self):
-		"""
-		Initializes a newly constructed UHArguments object, setting 
-		the arguments to their default values.
-		
-		Uh will not search if the properties are their defaults.
-		"""
-		self.header_filename = None 
-		self.searchdir = "." 
+    def __init__(self):
+        """
+        Initializes a newly constructed UHArguments object, setting 
+        the arguments to their default values.
+        
+        Uh will not search if the properties are their defaults.
+        """
+        self.header_filename = None 
+        self.searchdir = "." 
 
 
 # define what to do if this is used as a standalone exe instead of a module.
 if __name__ == "__main__":
-	(options, uh_args, err) = handle_cmdline()	
-	
+    (options, uh_args, err) = handle_cmdline()  
+    
