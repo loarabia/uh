@@ -80,7 +80,7 @@ class Test_handle_cmdline(unittest.TestCase):
 		(options, args, err) = uh.handle_cmdline()
 
 		self.assertFalse(err)
-		self.assertTrue(options.do_renameinfile)
+		self.assertTrue(options.do_rename)
 		self.assertTrue(args.header_filename == "baz.h")
 		self.assertTrue(args.searchdir == ".")
 
