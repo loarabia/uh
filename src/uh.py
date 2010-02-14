@@ -1,7 +1,7 @@
 #! /usr/bin/python
 
 #-----------------------------------------------------------------------------
-# <copyright file="uhmain.py" company="www.letstakeovertheworld.com">
+# <copyright file="uh.py" company="www.letstakeovertheworld.com">
 # (c) Copyright Larry Olson.
 # This source is subject to the New BSD License (BSD)
 # See http://uh.codeplex.com/license
@@ -42,7 +42,7 @@ def handle_cmdline():
 	parser = OptionParser(USAGE)
 	parser.add_option("-r","--rename",
 			action="store_true",
-			dest="renameinfile",
+			dest="do_rename",
 			default=False,
 			help="renames the headers prompting for each")
 

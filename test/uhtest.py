@@ -69,18 +69,18 @@ class Test_handle_cmdline(unittest.TestCase):
 		(options, args, err) = uh.handle_cmdline()
 
 		self.assertFalse(err)
-		self.assertFalse(options.renameinfile)
+		self.assertFalse(options.do_rename)
 		self.assertTrue(args.header_filename == "bam.h")
 		self.assertTrue(args.searchdir == ".")
 
-	def test_renameinfileflag(self):
+	def test_do_renameflag(self):
 		sys.argv.append("-r")
 		sys.argv.append("baz.h")
 
 		(options, args, err) = uh.handle_cmdline()
 
 		self.assertFalse(err)
-		self.assertTrue(options.renameinfile)
+		self.assertTrue(options.do_renameinfile)
 		self.assertTrue(args.header_filename == "baz.h")
 		self.assertTrue(args.searchdir == ".")
 
