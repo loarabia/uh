@@ -37,9 +37,14 @@ class Test_HeaderNormalizer(unittest.TestCase):
         self.assertTrue(join( rootdir, "rootInclude.h") in hn.candidateFiles)
         self.assertTrue(join( rootdir, "rootInclude.hpp") in hn.candidateFiles)
 
+        self.assertTrue( join( rootdir, "Fake.txt") not in hn.candidateFiles)
+
         rootdir = join(rootdir, "capsheads")
         self.assertTrue(join( rootdir, "rootInclude.H") in hn.candidateFiles)
         self.assertTrue(join( rootdir, "rootInclude.HPP") in hn.candidateFiles)
+        
+        self.assertTrue( join( rootdir, "dummy.txt") not in hn.candidateFiles)
+        
 
         
 
