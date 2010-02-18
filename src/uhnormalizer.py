@@ -23,7 +23,7 @@ class HeaderNormalizer:
     def __init__(self, do_rename):
         self.do_rename = do_rename
 
-        self.candidateFiles = []
+        self.candidate_files = []
         self.header_file_extensions = [".h",".hpp"]
 
         # Copy the list instead of passing a reference
@@ -37,5 +37,5 @@ class HeaderNormalizer:
             for file in files:
                 ext = splitext(file)[1]
                 if( ext.lower() in self.filetypes_containing_headers):
-                    self.candidateFiles.append( normpath(join(root,file)))
+                    self.candidate_files.append( normpath(join(root,file)))
        

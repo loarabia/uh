@@ -34,16 +34,16 @@ class Test_HeaderNormalizer(unittest.TestCase):
 
         rootdir = "scenarios\\fakeproject"
 
-        self.assertTrue(join( rootdir, "rootInclude.h") in hn.candidateFiles)
-        self.assertTrue(join( rootdir, "rootInclude.hpp") in hn.candidateFiles)
+        self.assertTrue(join(rootdir, "rootInclude.h") in hn.candidate_files)
+        self.assertTrue(join(rootdir, "rootInclude.hpp") in hn.candidate_files)
 
-        self.assertTrue( join( rootdir, "Fake.txt") not in hn.candidateFiles)
+        self.assertTrue(join(rootdir, "Fake.txt") not in hn.candidate_files)
 
         rootdir = join(rootdir, "capsheads")
-        self.assertTrue(join( rootdir, "rootInclude.H") in hn.candidateFiles)
-        self.assertTrue(join( rootdir, "rootInclude.HPP") in hn.candidateFiles)
+        self.assertTrue(join(rootdir, "rootInclude.H") in hn.candidate_files)
+        self.assertTrue(join(rootdir, "rootInclude.HPP") in hn.candidate_files)
         
-        self.assertTrue( join( rootdir, "dummy.txt") not in hn.candidateFiles)
+        self.assertTrue(join(rootdir, "dummy.txt") not in hn.candidate_files)
         
 
         
@@ -53,7 +53,7 @@ class Test_HeaderNormalizer(unittest.TestCase):
 
         self.assertFalse(hn.do_rename)
 
-        self.assertTrue(len(hn.candidateFiles) == 0)
+        self.assertTrue(len(hn.candidate_files) == 0)
 
         self.assertTrue(len(hn.header_file_extensions) == 2)
         self.assertTrue(".h" in hn.header_file_extensions)
@@ -68,7 +68,7 @@ class Test_HeaderNormalizer(unittest.TestCase):
 
         hn = HeaderNormalizer(True)
         self.assertTrue(hn.do_rename)
-        self.assertTrue(len(hn.candidateFiles) == 0)
+        self.assertTrue(len(hn.candidate_files) == 0)
 
         self.assertTrue(len(hn.header_file_extensions) == 2)
         self.assertTrue(".h" in hn.header_file_extensions)
