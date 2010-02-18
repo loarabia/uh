@@ -32,6 +32,14 @@ class HeaderNormalizer:
         self.filetypes_containing_headers.append(".c")
 
     def find_files_containing_headers(self, searchdir):
+        """
+        Searches for all C and CPP source and header files beneath searchdir.
+        Each file is added to a candidate list of files stored on the object
+        as self.candidate_files as a side effect of calling this method. 
+        
+        This method returns nothing.
+        """
+        
         for root, dirs, files in os.walk(searchdir):
             
             for file in files:
