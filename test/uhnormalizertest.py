@@ -17,6 +17,7 @@ import sys
 sys.path.append("../src")
 
 import unittest
+from os.path import join
 
 from uhnormalizer import HeaderNormalizer
 
@@ -31,8 +32,15 @@ class Test_HeaderNormalizer(unittest.TestCase):
         hn = HeaderNormalizer(False)
         hn.find_files_containing_headers(".\scenarios")
 
-        self.assertTrue( \
-            "scenarios\\fakeproject\\rootInclude.h" in hn.candidateFiles)
+        rootdir = "scenarios\\fakeproject"
+
+        self.assertTrue(join( rootdir, "rootInclude.h") in hn.candidateFiles)
+        self.assertTrue(join( rootdir, "rootInclude.hpp") in hn.candidateFiles)
+
+        rootdir = join(rootdir, "capsheads")
+        self.assertTrue(join( rootdir, "rootInclude.H") in hn.candidateFiles)
+        self.assertTrue(join( rootdir, "rootInclude.HPP") in hn.candidateFiles)
+
         
 
     def test_init(self):
