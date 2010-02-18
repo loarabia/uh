@@ -29,10 +29,10 @@ class Test_HeaderNormalizer(unittest.TestCase):
     def test_finds_headers_ext_h(self):
                 
         hn = HeaderNormalizer(False)
-        hn.find_files_containing_headers("./scenarios")
+        hn.find_files_containing_headers(".\scenarios")
 
         self.assertTrue( \
-            "./scenarios/fakeproject/rootinclude.h" in hn.candidateFiles)
+            "scenarios\\fakeproject\\rootInclude.h" in hn.candidateFiles)
         
 
     def test_init(self):

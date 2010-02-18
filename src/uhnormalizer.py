@@ -16,7 +16,7 @@
 import os
 import re
 
-from os.path import join
+from os.path import join, splitext, normpath
 
 class HeaderNormalizer:
 
@@ -31,3 +31,11 @@ class HeaderNormalizer:
         self.filetypes_containing_headers.append(".cpp")
         self.filetypes_containing_headers.append(".c")
 
+    def find_files_containing_headers(self, searchdir):
+        for root, dirs, files in os.walk(searchdir):
+            
+            for file in files:
+                ext = splitext(file)[1]
+                if( ext.lower() in self.filetypes_containing_headers):
+                    self.candidateFiles.append( normpath(join(root,file)))
+       
