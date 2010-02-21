@@ -18,6 +18,7 @@ sys.path.append("../src")
 
 import unittest
 from os.path import join
+from os import remove
 
 from uhnormalizer import HeaderNormalizer
 
@@ -115,6 +116,32 @@ class Test_HeaderNormalizer(unittest.TestCase):
         self.assertEquals(matches[0].start, 25)
         self.assertEquals(matches[1].string, "#include \"header1.h\"")
         self.assertEquals(matches[1].start, 94)
+
+    def test_rename_headers_in_file(self):
+        header = "header1.h"
+        file = "scenarios\\fakeproject\\test.c"
+        fileCopy = "scenarios\\fakeproject\\testCopy.c"
+
+        fd = open(file,"r")
+        contents = fd.read()
+        fd.close()
+
+        tfd = open(fileCopy, "w")
+        tfd.write(contents)
+        tfd.close()
+
+        hn = HeaderNormalizer(True) 
+        hn.rename_headers_in_file(header, fileCopy)
+
+        matches = hn.find_header_in_file(header, fileCopy)
+        self.assertEquals(len(matches),2)
+        self.assertEquals(matches[0].string, "#include \"header1.h\"")
+        self.assertEquals(matches[0].start, 25)
+        self.assertEquals(matches[1].string, "#include \"header1.h\"")
+        self.assertEquals(matches[1].start, 94)
+
+        remove(fileCopy)
+
 
 if __name__ == '__main__':
     unittest.main()

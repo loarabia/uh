@@ -71,6 +71,9 @@ class HeaderNormalizer:
 
         return matchesData 
 
+    def rename_headers_in_file(self,header, file):
+        pass
+
 class MatchData:
 
     def __init__(self, start, end, string):
