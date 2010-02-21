@@ -87,15 +87,20 @@ class Test_HeaderNormalizer(unittest.TestCase):
         file2 = "scenarios\\fakeproject\\test.c"
         header = "rootInclude.h"
 
-        (start, len) = hn.find_header_in_file(header,file1)
+        matches = hn.find_header_in_file(header,file1)
+        self.assertEquals(len(matches), 1)
 
-        self.assertEquals(start, 11)
-        self.assertEquals(len,  13)
+        self.assertEquals(matches[0].start, 27)
+        self.assertEquals(matches[0].end, 51)
+        self.assertEquals(matches[0].length, 24)
+        self.assertEquals(matches[0].string, "#include \"rootInclude.H\"")
 
-        (start, len) = hn.find_header_in_file(header,file2)
+        matches = hn.find_header_in_file(header,file2)
+        self.assertEquals(len(matches), 1)
 
-        self.assertEquals(start,  11)
-        self.assertEquals(len,  13)
+        self.assertEquals(matches[0].start, 0)
+        self.assertEquals(matches[0].end, 24)
+        self.assertEquals(matches[0].string, "#include \"rootInclude.h\"")
 
 if __name__ == '__main__':
     unittest.main()

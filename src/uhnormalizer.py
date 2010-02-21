@@ -50,6 +50,31 @@ class HeaderNormalizer:
         return candidate_files
 
     def find_header_in_file(self, header, file):
-        start = -1
-        len = 0
-        return (start, len)
+        """
+        Searchs a file for all header includes that match the passed header.
+
+        Returns a list of MatchData objects describing the location of the
+        header lines.
+        """
+        matchesData = []
+
+        fd = open(file,"r")
+        contents = fd.read()
+        fd.close()
+
+        patternString = "#include.+\""+header+"\""
+        pattern = re.compile(patternString, re.IGNORECASE)
+        matches = pattern.finditer(contents)
+
+        for m in matches:
+            matchesData.append( MatchData(m.start(), m.end(), m.group(0)))
+
+        return matchesData 
+
+class MatchData:
+
+    def __init__(self, start, end, string):
+        self.start = start
+        self.end = end
+        self.string = string
+        self.length = end - start
