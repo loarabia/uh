@@ -27,39 +27,36 @@ class Test_HeaderNormalizer(unittest.TestCase):
     Test the HeaderNormalizer class.
     """
 
-    def test_finds_headers_ext_h(self):
+    def test_finds_header_files(self):
                 
         hn = HeaderNormalizer(False)
-        hn.find_files_containing_headers(".\scenarios")
+        candidate_files = hn.find_files_containing_headers(".\scenarios")
 
         rootdir = "scenarios\\fakeproject"
 
-        self.assertTrue(join(rootdir, "rootInclude.h") in hn.candidate_files)
-        self.assertTrue(join(rootdir, "rootInclude.hpp") in hn.candidate_files)
-        self.assertTrue(join(rootdir, "test.c") in hn.candidate_files)
+        self.assertTrue(join(rootdir, "rootInclude.h") in candidate_files)
+        self.assertTrue(join(rootdir, "rootInclude.hpp") in candidate_files)
+        self.assertTrue(join(rootdir, "test.c") in candidate_files)
 
-        self.assertTrue(join(rootdir, "Fake.txt") not in hn.candidate_files)
+        self.assertTrue(join(rootdir, "Fake.txt") not in candidate_files)
 
         rootdir = join(rootdir, "capsheads")
-        self.assertTrue(join(rootdir, "rootInclude.H") in hn.candidate_files)
-        self.assertTrue(join(rootdir, "rootInclude.HPP") in hn.candidate_files)
-        self.assertTrue(join(rootdir, "test.CPP") in hn.candidate_files)
+        self.assertTrue(join(rootdir, "rootInclude.H") in candidate_files)
+        self.assertTrue(join(rootdir, "rootInclude.HPP") in candidate_files)
+        self.assertTrue(join(rootdir, "test.CPP") in candidate_files)
         
-        self.assertTrue(join(rootdir, "dummy.txt") not in hn.candidate_files)
+        self.assertTrue(join(rootdir, "dummy.txt") not in candidate_files)
         
-
-        
-
     def test_init(self):
         hn = HeaderNormalizer(False) 
 
         self.assertFalse(hn.do_rename)
 
-        self.assertTrue(len(hn.candidate_files) == 0)
-
         self.assertTrue(len(hn.header_file_extensions) == 2)
         self.assertTrue(".h" in hn.header_file_extensions)
         self.assertTrue(".hpp" in hn.header_file_extensions)
+        self.assertTrue(".c" not in hn.header_file_extensions)
+        self.assertTrue(".cpp" not in hn.header_file_extensions)
 
         self.assertTrue(len(hn.filetypes_containing_headers) == 4)
         self.assertTrue(".h" in hn.filetypes_containing_headers)
@@ -70,18 +67,18 @@ class Test_HeaderNormalizer(unittest.TestCase):
 
         hn = HeaderNormalizer(True)
         self.assertTrue(hn.do_rename)
-        self.assertTrue(len(hn.candidate_files) == 0)
 
         self.assertTrue(len(hn.header_file_extensions) == 2)
         self.assertTrue(".h" in hn.header_file_extensions)
         self.assertTrue(".hpp" in hn.header_file_extensions)
+        self.assertTrue(".c" not in hn.header_file_extensions)
+        self.assertTrue(".cpp" not in hn.header_file_extensions)
 
         self.assertTrue(len(hn.filetypes_containing_headers) == 4)
         self.assertTrue(".h" in hn.filetypes_containing_headers)
         self.assertTrue(".hpp" in hn.filetypes_containing_headers)
         self.assertTrue(".c" in hn.filetypes_containing_headers)
         self.assertTrue(".cpp" in hn.filetypes_containing_headers)
-
 
 if __name__ == '__main__':
     unittest.main()

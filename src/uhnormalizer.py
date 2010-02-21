@@ -23,7 +23,6 @@ class HeaderNormalizer:
     def __init__(self, do_rename):
         self.do_rename = do_rename
 
-        self.candidate_files = []
         self.header_file_extensions = [".h",".hpp"]
 
         # Copy the list instead of passing a reference
@@ -37,13 +36,15 @@ class HeaderNormalizer:
         Each file is added to a candidate list of files stored on the object
         as self.candidate_files as a side effect of calling this method. 
         
-        This method returns nothing.
+        returns a list of candidate files
         """
+        candidate_files = []
         
         for root, dirs, files in os.walk(searchdir):
             
             for file in files:
                 ext = splitext(file)[1]
                 if( ext.lower() in self.filetypes_containing_headers):
-                    self.candidate_files.append( normpath(join(root,file)))
-       
+                    candidate_files.append( normpath(join(root,file)))
+
+        return candidate_files
