@@ -48,3 +48,8 @@ class HeaderNormalizer:
                     candidate_files.append( normpath(join(root,file)))
 
         return candidate_files
+
+    def find_header_in_file(self, header, file):
+        start = -1
+        len = 0
+        return (start, len)

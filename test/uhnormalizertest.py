@@ -80,5 +80,22 @@ class Test_HeaderNormalizer(unittest.TestCase):
         self.assertTrue(".c" in hn.filetypes_containing_headers)
         self.assertTrue(".cpp" in hn.filetypes_containing_headers)
 
+    def test_find_header_in_file(self):
+        hn = HeaderNormalizer(False)
+
+        file1 = "scenarios\\fakeproject\\source\\test.c"
+        file2 = "scenarios\\fakeproject\\test.c"
+        header = "rootInclude.h"
+
+        (start, len) = hn.find_header_in_file(header,file1)
+
+        self.assertEquals(start, 11)
+        self.assertEquals(len,  13)
+
+        (start, len) = hn.find_header_in_file(header,file2)
+
+        self.assertEquals(start,  11)
+        self.assertEquals(len,  13)
+
 if __name__ == '__main__':
     unittest.main()
