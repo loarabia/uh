@@ -75,7 +75,16 @@ class HeaderNormalizer:
         return matchesData 
 
     def rename_headers_in_file(self,header, file):
-        pass
+        matches = self.find_header_in_file(header, file)
+        patternString = bytes("#include \""+header+"\"","utf_8")# + os.linesep
+
+        fd = open(file, "rb+")
+
+        for m in matches:
+            fd.seek(m.start)
+            fd.write(patternString)
+
+        fd.close()
 
 
 class MatchData:

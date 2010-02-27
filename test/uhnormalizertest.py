@@ -119,7 +119,6 @@ class Test_HeaderNormalizer(unittest.TestCase):
         self.assertEquals(matches[1].start, 98)
 
     def test_rename_headers_in_file(self):
-        return
         header = "header1.h"
         file = "scenarios\\fakeproject\\test.c"
         fileCopy = "scenarios\\fakeproject\\testCopy.c"
@@ -139,10 +138,10 @@ class Test_HeaderNormalizer(unittest.TestCase):
         remove(fileCopy)
 
         self.assertEquals(len(matches),2)
-        self.assertEquals(matches[0].string, "#include \"header1.h\"")
-        self.assertEquals(matches[0].start, 25)
-        self.assertEquals(matches[1].string, "#include \"header1.h\"")
-        self.assertEquals(matches[1].start, 94)
+        self.assertEquals(matches[0].string, b"#include \"header1.h\"")
+        self.assertEquals(matches[0].start, 26)
+        self.assertEquals(matches[1].string, b"#include \"header1.h\"")
+        self.assertEquals(matches[1].start, 98)
 
 
 
