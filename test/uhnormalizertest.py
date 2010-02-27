@@ -17,7 +17,7 @@ import sys
 sys.path.append("../src")
 
 import unittest
-from os.path import join
+from os.path import join, normpath
 from os import remove
 
 from uhnormalizer import HeaderNormalizer
@@ -31,9 +31,10 @@ class Test_HeaderNormalizer(unittest.TestCase):
     def test_finds_header_files(self):
                 
         hn = HeaderNormalizer(False)
-        candidate_files = hn.find_files_containing_headers(".\scenarios")
+        candidate_files = hn.find_files_containing_headers("scenarios")
 
-        rootdir = "scenarios\\fakeproject"
+        rootdir = join("scenarios","fakeproject")
+        print(candidate_files)
 
         self.assertTrue(join(rootdir, "rootInclude.h") in candidate_files)
         self.assertTrue(join(rootdir, "rootInclude.hpp") in candidate_files)
@@ -84,8 +85,8 @@ class Test_HeaderNormalizer(unittest.TestCase):
     def test_find_header_in_file_included_once(self):
         hn = HeaderNormalizer(False)
 
-        file1 = "scenarios\\fakeproject\\source\\test.c"
-        file2 = "scenarios\\fakeproject\\test.c"
+        file1 = join("scenarios","fakeproject","source","test.c")
+        file2 = join("scenarios","fakeproject","test.c")
         header = "rootInclude.h"
 
         matches = hn.find_header_in_file(header,file1)
@@ -108,7 +109,7 @@ class Test_HeaderNormalizer(unittest.TestCase):
         hn = HeaderNormalizer(False)
 
         header ="header1.h"
-        file = "scenarios\\fakeproject\\test.c"
+        file = join("scenarios","fakeproject","test.c")
 
         matches = hn.find_header_in_file(header,file)
 
@@ -120,8 +121,8 @@ class Test_HeaderNormalizer(unittest.TestCase):
 
     def test_rename_headers_in_file(self):
         header = "header1.h"
-        file = "scenarios\\fakeproject\\test.c"
-        fileCopy = "scenarios\\fakeproject\\testCopy.c"
+        file = join("scenarios","fakeproject","test.c")
+        fileCopy = join("scenarios","fakeproject","testCopy.c")
 
         fd = open(file,"r")
         contents = fd.read()
