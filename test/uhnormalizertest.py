@@ -123,11 +123,11 @@ class Test_HeaderNormalizer(unittest.TestCase):
         file = join("scenarios","fakeproject","test.c")
         fileCopy = join("scenarios","fakeproject","testCopy.c")
 
-        fd = open(file,"r")
+        fd = open(file,"rb")
         contents = fd.read()
         fd.close()
 
-        tfd = open(fileCopy, "w")
+        tfd = open(fileCopy, "wb")
         tfd.write(contents)
         tfd.close()
 
