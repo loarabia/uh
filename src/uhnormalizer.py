@@ -58,12 +58,15 @@ class HeaderNormalizer:
         """
         matchesData = []
 
-        fd = open(file,"r")
+        # Work in Binary mode to bypass the tweaking of newlines that python
+        # does on Windows
+        fd = open(file,"rb")
         contents = fd.read()
         fd.close()
 
-        patternString = "#include.+\""+header+"\""
-        pattern = re.compile(patternString, re.IGNORECASE)
+        patternString = "#include\s+\""+header+"\"" 
+        patternBytes = bytes(patternString,"utf_8")
+        pattern = re.compile(patternBytes, re.IGNORECASE )
         matches = pattern.finditer(contents)
 
         for m in matches:
@@ -73,6 +76,7 @@ class HeaderNormalizer:
 
     def rename_headers_in_file(self,header, file):
         pass
+
 
 class MatchData:
 
