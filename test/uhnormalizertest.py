@@ -34,7 +34,6 @@ class Test_HeaderNormalizer(unittest.TestCase):
         candidate_files = hn.find_files_containing_headers("scenarios")
 
         rootdir = join("scenarios","fakeproject")
-        print(candidate_files)
 
         self.assertTrue(join(rootdir, "rootInclude.h") in candidate_files)
         self.assertTrue(join(rootdir, "rootInclude.hpp") in candidate_files)
