@@ -51,7 +51,7 @@ class HeaderNormalizer:
 
     def find_header_in_file(self, header, file):
         """
-        Searchs a file for all header includes that match the passed header.
+        Searches a file for all header includes that match the passed header.
 
         Returns a list of MatchData objects describing the location of the
         header lines.
@@ -74,7 +74,15 @@ class HeaderNormalizer:
 
         return matchesData 
 
-    def rename_headers_in_file(self,header, file):
+    def rename_headers_in_file(self, header, file):
+        """
+        Searches a file for all header includes that matche the passed header
+        and replaces them in the file.
+
+        The current replacement mechanism will replace the entire line so that
+        the line in the file contains just the include. Any extra space or
+        other not include statement data on the line will be removed.
+        """
         matches = self.find_header_in_file(header, file)
         patternString = bytes("#include \""+header+"\"","utf_8")# + os.linesep
 
@@ -86,8 +94,6 @@ class HeaderNormalizer:
             # pad out the rest of the line
             while fd.tell() < m.end:
                 fd.write(b" ")
-            
-                
 
         fd.close()
 
