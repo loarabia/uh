@@ -83,6 +83,11 @@ class HeaderNormalizer:
         for m in matches:
             fd.seek(m.start)
             fd.write(patternString)
+            # pad out the rest of the line
+            while fd.tell() < m.end:
+                fd.write(b" ")
+            
+                
 
         fd.close()
 

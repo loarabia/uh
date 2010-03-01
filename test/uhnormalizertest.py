@@ -171,7 +171,7 @@ class Test_HeaderNormalizer(unittest.TestCase):
         self.assertTrue(data != b"aa.h\"")
 
         tfd.close()
-        #remove(fileCopy)
+        remove(fileCopy)
 
 
 if __name__ == '__main__':
