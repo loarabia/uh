@@ -143,6 +143,35 @@ class Test_HeaderNormalizer(unittest.TestCase):
         self.assertEquals(matches[1].string, b"#include \"header1.h\"")
         self.assertEquals(matches[1].start, 98)
 
+    def test_rename_headers_in_file_extra_spaces(self):
+        header = "aaaaaaaaaa.h"
+        file = join("scenarios","fakeproject","test.c")
+        fileCopy = join("scenarios","fakeproject","testCopyCopy.c")
+
+        fd = open(file,"rb")
+        contents = fd.read()
+        fd.close()
+
+        tfd = open(fileCopy, "wb")
+        tfd.write(contents)
+        tfd.close()
+
+        hn = HeaderNormalizer(True) 
+        matches = hn.find_header_in_file(header,fileCopy)
+        self.assertEquals(len(matches),1)
+    
+        hn.rename_headers_in_file(header, fileCopy)
+        matches = hn.find_header_in_file(header, fileCopy)
+        self.assertEquals(len(matches),1)
+       
+        # check that the include line doesn't have any extra cruft
+        tfd = open(fileCopy, "rb")
+        tfd.seek(matches[0].end)
+        data = tfd.read(5)
+        self.assertTrue(data != b"aa.h\"")
+
+        tfd.close()
+        #remove(fileCopy)
 
 
 if __name__ == '__main__':
