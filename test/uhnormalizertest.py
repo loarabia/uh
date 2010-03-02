@@ -19,6 +19,7 @@ sys.path.append("../src")
 import unittest
 from os.path import join, normpath
 from os import remove
+from shutil import copyfile
 
 from uhnormalizer import HeaderNormalizer
 
@@ -105,13 +106,7 @@ class Test_HeaderNormalizer(unittest.TestCase):
         file = join("scenarios","fakeproject","test.c")
         fileCopy = join("scenarios","fakeproject","testCopy.c")
 
-        fd = open(file,"rb")
-        contents = fd.read()
-        fd.close()
-
-        tfd = open(fileCopy, "wb")
-        tfd.write(contents)
-        tfd.close()
+        copyfile(file, fileCopy)
 
         hn = HeaderNormalizer() 
         hn.rename_headers_in_file(header, fileCopy)
@@ -130,13 +125,7 @@ class Test_HeaderNormalizer(unittest.TestCase):
         file = join("scenarios","fakeproject","test.c")
         fileCopy = join("scenarios","fakeproject","testCopyCopy.c")
 
-        fd = open(file,"rb")
-        contents = fd.read()
-        fd.close()
-
-        tfd = open(fileCopy, "wb")
-        tfd.write(contents)
-        tfd.close()
+        copyfile(file, fileCopy)
 
         hn = HeaderNormalizer() 
         matches = hn.find_header_in_file(header,fileCopy)
