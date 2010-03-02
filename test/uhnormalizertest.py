@@ -30,7 +30,7 @@ class Test_HeaderNormalizer(unittest.TestCase):
 
     def test_finds_header_files(self):
                 
-        hn = HeaderNormalizer(False)
+        hn = HeaderNormalizer()
         candidate_files = hn.find_files_containing_headers("scenarios")
 
         rootdir = join("scenarios","fakeproject")
@@ -49,25 +49,7 @@ class Test_HeaderNormalizer(unittest.TestCase):
         self.assertTrue(join(rootdir, "dummy.txt") not in candidate_files)
         
     def test_init(self):
-        hn = HeaderNormalizer(False) 
-
-        self.assertFalse(hn.do_rename)
-
-        self.assertTrue(len(hn.header_file_extensions) == 2)
-        self.assertTrue(".h" in hn.header_file_extensions)
-        self.assertTrue(".hpp" in hn.header_file_extensions)
-        self.assertTrue(".c" not in hn.header_file_extensions)
-        self.assertTrue(".cpp" not in hn.header_file_extensions)
-
-        self.assertTrue(len(hn.filetypes_containing_headers) == 4)
-        self.assertTrue(".h" in hn.filetypes_containing_headers)
-        self.assertTrue(".hpp" in hn.filetypes_containing_headers)
-        self.assertTrue(".c" in hn.filetypes_containing_headers)
-        self.assertTrue(".cpp" in hn.filetypes_containing_headers)
-
-
-        hn = HeaderNormalizer(True)
-        self.assertTrue(hn.do_rename)
+        hn = HeaderNormalizer() 
 
         self.assertTrue(len(hn.header_file_extensions) == 2)
         self.assertTrue(".h" in hn.header_file_extensions)
@@ -82,7 +64,7 @@ class Test_HeaderNormalizer(unittest.TestCase):
         self.assertTrue(".cpp" in hn.filetypes_containing_headers)
 
     def test_find_header_in_file_included_once(self):
-        hn = HeaderNormalizer(False)
+        hn = HeaderNormalizer()
 
         file1 = join("scenarios","fakeproject","source","test.c")
         file2 = join("scenarios","fakeproject","test.c")
@@ -105,7 +87,7 @@ class Test_HeaderNormalizer(unittest.TestCase):
         self.assertEquals(matches[0].string, b"#include \"rootInclude.h\"")
 
     def test_find_header_in_file_include_multiple(self):
-        hn = HeaderNormalizer(False)
+        hn = HeaderNormalizer()
 
         header ="header1.h"
         file = join("scenarios","fakeproject","test.c")
@@ -131,7 +113,7 @@ class Test_HeaderNormalizer(unittest.TestCase):
         tfd.write(contents)
         tfd.close()
 
-        hn = HeaderNormalizer(True) 
+        hn = HeaderNormalizer() 
         hn.rename_headers_in_file(header, fileCopy)
 
         matches = hn.find_header_in_file(header, fileCopy)
@@ -156,7 +138,7 @@ class Test_HeaderNormalizer(unittest.TestCase):
         tfd.write(contents)
         tfd.close()
 
-        hn = HeaderNormalizer(True) 
+        hn = HeaderNormalizer() 
         matches = hn.find_header_in_file(header,fileCopy)
         self.assertEquals(len(matches),1)
     

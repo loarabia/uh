@@ -86,4 +86,3 @@ class UHArguments:
 # define what to do if this is used as a standalone exe instead of a module.
 if __name__ == "__main__":
     (options, uh_args, err) = handle_cmdline()  
-    

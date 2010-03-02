@@ -20,8 +20,7 @@ from os.path import join, splitext, normpath
 
 class HeaderNormalizer:
 
-    def __init__(self, do_rename):
-        self.do_rename = do_rename
+    def __init__(self):
 
         self.header_file_extensions = [".h",".hpp"]
 
