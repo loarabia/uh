@@ -16,10 +16,13 @@
 import sys
 sys.path.append("../src")
 
+import os
+import re
+import shutil
+import subprocess
 import unittest
 
 import uh
-
 
 class Test_UHArguments(unittest.TestCase):
     """
@@ -92,6 +95,46 @@ class Test_handle_cmdline(unittest.TestCase):
         while( len(sys.argv) > 1):
             sys.argv.pop()
 
+
+class Test_Main(unittest.TestCase):
+    """
+    Test the main function itself.
+    
+    Uses a subprocess to execute the tool since the main method itself really
+    doesn't have any noticeable side-effects except in the rename case.
+
+    """
+
+    def test_optional_dir(self):
+        pass
+
+    def test_header_filename(self):
+        output = subprocess.check_output(["python","../src/uh.py","rootInclude.h"])
+        self.assertTrue(output != b"")
+
+        output_lines = output.split(bytes(os.linesep,"utf_8"))
+        self.assertEquals( len(output_lines) , 7 )
+
+        self.assertTrue(  \
+            re.search(b"\\\\fakeproject\\\\test.c",output_lines[0]) != None) 
+        self.assertTrue(re.search(b"Start 0 End 24", output_lines[1]) != None)
+        self.assertTrue( \
+            re.search(b"\\\\source\\\\test.c",output_lines[3]) != None) 
+        self.assertTrue(re.search(b"Start 28 End 52", output_lines[4]) != None)
+
+
+    def test_do_rename(self):
+        pass
+
+
+class TestOptions:
+    """
+    Create a fake Options object with object model similar to what OpionParser
+    would generate
+    """
+
+    def __init__(self):
+        self.do_rename = False
 
 
 if __name__ == '__main__':

@@ -15,6 +15,7 @@
 # </summary>
 #-----------------------------------------------------------------------------
 from optparse import OptionParser
+from uhnormalizer import HeaderNormalizer
 
 USAGE = \
 """
@@ -25,8 +26,19 @@ NO_ERROR = 0
 BAD_ARGS = 1
 
 
-def main():
-    pass
+def main(options, args):
+    hn = HeaderNormalizer()
+    candidates = hn.find_files_containing_headers(args.searchdir)
+    matches = []
+    for file in candidates:
+        matches = hn.find_header_in_file(args.header_filename, file)
+        if( len(matches) > 1):
+            print("Found %d matches in %s" % (len(matches),file))
+        elif( len(matches) == 1):
+            print("Found %d match in %s" % (len(matches),file))
+        for m in matches:
+            print( "\tStart %d End %d\t\t Data %s" %(m.start,m.end,m.string))
+            print()
 
 
 def handle_cmdline():
@@ -86,3 +98,13 @@ class UHArguments:
 # define what to do if this is used as a standalone exe instead of a module.
 if __name__ == "__main__":
     (options, uh_args, err) = handle_cmdline()  
+
+    # if __name__ is __main__ , then the error paths should all go through
+    # OptionParser's error mechanism (parser.error() ). Otherwise, this is
+    # being used as a library and the err object will be populated.
+    #
+    # This assert catches the fact that someone added error code paths that
+    # didn't obey that pattern to handle_cmdline().
+    assert(err == NO_ERROR)
+
+    main( options, uh_args)
