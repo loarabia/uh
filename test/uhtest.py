@@ -106,7 +106,16 @@ class Test_Main(unittest.TestCase):
     """
 
     def test_optional_dir(self):
-        pass
+        output = subprocess.check_output( \
+            ["python","../src/uh.py","rootInclude.h","scenarios\\fakeproject\\source"])
+        self.assertTrue(output != b"")
+        output_lines = output.split(bytes(os.linesep,"utf_8"))
+        self.assertEquals( len(output_lines), 4)
+
+        self.assertTrue( \
+            re.search(b"\\\\source\\\\test.c",output_lines[0]) != None) 
+        self.assertTrue(re.search(b"Start 28 End 52", output_lines[1]) != None)
+
 
     def test_header_filename(self):
         output = subprocess.check_output(["python","../src/uh.py","rootInclude.h"])
