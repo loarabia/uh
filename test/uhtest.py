@@ -106,35 +106,59 @@ class Test_Main(unittest.TestCase):
     """
 
     def test_optional_dir(self):
-        output = subprocess.check_output( \
-            ["python","../src/uh.py","rootInclude.h","scenarios\\fakeproject\\source"])
+        search_dir = os.path.join("scenarios","fakeproject","source")
+        output = runTool("rootInclude.h",search_dir)
         self.assertTrue(output != b"")
         output_lines = output.split(bytes(os.linesep,"utf_8"))
         self.assertEquals( len(output_lines), 4)
 
-        self.assertTrue( \
-            re.search(b"\\\\source\\\\test.c",output_lines[0]) != None) 
+        matchStr = bytes(os.path.join("source","test"),"utf_8")
+        self.assertNotEqual( re.search(matchStr ,output_lines[0]) ,None) 
         self.assertTrue(re.search(b"Start 28 End 52", output_lines[1]) != None)
 
 
     def test_header_filename(self):
-        output = subprocess.check_output(["python","../src/uh.py","rootInclude.h"])
-        self.assertTrue(output != b"")
+        output = runTool("rootInclude.h")
+        self.assertNotEqual(output , b"")
 
         output_lines = output.split(bytes(os.linesep,"utf_8"))
         self.assertEquals( len(output_lines) , 7 )
 
-        self.assertTrue(  \
-            re.search(b"\\\\fakeproject\\\\test.c",output_lines[0]) != None) 
-        self.assertTrue(re.search(b"Start 0 End 24", output_lines[1]) != None)
-        self.assertTrue( \
-            re.search(b"\\\\source\\\\test.c",output_lines[3]) != None) 
-        self.assertTrue(re.search(b"Start 28 End 52", output_lines[4]) != None)
+        matchStr = bytes( os.path.join("fakeproject","test.c"),"utf_8")
+        self.assertNotEqual(re.search(matchStr,output_lines[0]), None) 
+        self.assertNotEqual(re.search(b"Start 0 End 24", output_lines[1]),None)
+
+        matchStr = bytes(os.path.join("source","test.c"),"utf_8")
+        self.assertNotEqual(re.search(matchStr, output_lines[3]),  None) 
+        self.assertNotEqual(re.search(b"Start 28 End 52",output_lines[4]),None)
 
 
     def test_do_rename(self):
         pass
 
+
+def runTool(header_file, search_dir=None):
+    """
+    This runs the command and returns the output string.
+
+    The purpose behind this method is to abstract away the differences between
+    Mac, Windows, and Linux as far as the name of the tool.
+    """
+    command = "python"
+    altCommand = "python3"
+    tool = os.path.join("..","src","uh.py")
+
+    commandLine = [command, tool, header_file, search_dir]
+    if search_dir == None:
+        commandLine.pop()
+
+    try:
+        result = subprocess.check_output(commandLine, stderr=subprocess.PIPE) 
+    except:
+        commandLine[0] = altCommand
+        result = subprocess.check_output(commandLine, stderr=subprocess.PIPE) 
+    return result
+    
 
 class TestOptions:
     """
