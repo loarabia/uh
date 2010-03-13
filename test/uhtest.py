@@ -107,12 +107,15 @@ class Test_Main(unittest.TestCase):
 
     def test_optional_dir(self):
         search_dir = os.path.join("scenarios","fakeproject","source")
+
         output = runTool("rootInclude.h",search_dir)
         self.assertTrue(output != b"")
+
         output_lines = output.split(bytes(os.linesep,"utf_8"))
         self.assertEquals( len(output_lines), 4)
 
-        matchStr = bytes(os.path.join("source","test"),"utf_8")
+        #matchStr = bytes(os.path.join("source","test.c"),"utf_8")
+        matchStr = b"source.test\.c"
         self.assertNotEqual( re.search(matchStr ,output_lines[0]) ,None) 
         self.assertTrue(re.search(b"Start 28 End 52", output_lines[1]) != None)
 
@@ -124,20 +127,27 @@ class Test_Main(unittest.TestCase):
         output_lines = output.split(bytes(os.linesep,"utf_8"))
         self.assertEquals( len(output_lines) , 7 )
 
-        matchStr = bytes( os.path.join("fakeproject","test.c"),"utf_8")
+        #matchStr = bytes( os.path.join("fakeproject","test.c"),"utf_8")
+        # fakeproject/test.c
+        matchStr = b"fakeproject.test\.c"
         self.assertNotEqual(re.search(matchStr,output_lines[0]), None) 
         self.assertNotEqual(re.search(b"Start 0 End 24", output_lines[1]),None)
 
-        matchStr = bytes(os.path.join("source","test.c"),"utf_8")
+        #matchStr = bytes(os.path.join("source","test.c"),"utf_8")
+        # source/test.c
+        matchStr = b"source.test\.c"
         self.assertNotEqual(re.search(matchStr, output_lines[3]),  None) 
         self.assertNotEqual(re.search(b"Start 28 End 52",output_lines[4]),None)
 
 
     def test_do_rename(self):
+        #shutil.copytree("scenarios","tempscenarios") 
+        #output = runTool("rootInclude.h","tempscenarios",rename=True)
+        #shutil.rmtree("tempscenarios",True)
         pass
 
 
-def runTool(header_file, search_dir=None):
+def runTool(header_file, search_dir=None):#, rename=False):
     """
     This runs the command and returns the output string.
 
@@ -151,6 +161,9 @@ def runTool(header_file, search_dir=None):
     commandLine = [command, tool, header_file, search_dir]
     if search_dir == None:
         commandLine.pop()
+
+    #if rename:
+    #    commandLine.insert(2,"-r")
 
     try:
         result = subprocess.check_output(commandLine, stderr=subprocess.PIPE) 
