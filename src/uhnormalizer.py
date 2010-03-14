@@ -8,8 +8,8 @@
 # <author> Larry Olson </author>
 # <date> 2.13.2010 </date>
 # <summary> 
-# Handles the invocation of the update header tool by parsing options and
-# executing the appropriate renaming functionality.
+# This is a library of functions that the tool actually uses to search for and 
+# rename headers.
 # </summary>
 #-----------------------------------------------------------------------------
 
