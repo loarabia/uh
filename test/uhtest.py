@@ -141,13 +141,35 @@ class Test_Main(unittest.TestCase):
 
 
     def test_do_rename(self):
-        #shutil.copytree("scenarios","tempscenarios") 
-        #output = runTool("rootInclude.h","tempscenarios",rename=True)
-        #shutil.rmtree("tempscenarios",True)
-        pass
+        # Be careful working with this test case and  test_header_filename
+        # test_header_filename runs from the test directory and therefore if
+        # this test directory (tempscenarios) isn't cleaned up, it will throw
+        # off test_header_filename because that test is searching from the 
+        # current working directory which should in this case be uh/test.
+        shutil.copytree("scenarios","tempscenarios") 
+        output = runTool("rootInclude.h","tempscenarios",rename=True)
+
+        origFile = os.path.join("scenarios","fakeproject","source","test.c")
+        newFile = os.path.join("tempscenarios","fakeproject","source","test.c")
+        origFd = open(origFile, "r")
+        newFd = open(newFile, "r")
+
+        origContents = origFd.read()
+        newContents = newFd.read()
+        origFd.close()
+        newFd.close()
+
+        shutil.rmtree("tempscenarios")
+
+        self.assertNotEqual(origContents, newContents)
+
+        oldPattern = "rootInclude\.H"
+        newPattern = "rootInclude\.h"
+        self.assertEqual( re.search(oldPattern, newContents), None)
+        self.assertNotEqual( re.search(newPattern, newContents), None)
 
 
-def runTool(header_file, search_dir=None):#, rename=False):
+def runTool(header_file, search_dir=None, rename=False):
     """
     This runs the command and returns the output string.
 
@@ -162,14 +184,14 @@ def runTool(header_file, search_dir=None):#, rename=False):
     if search_dir == None:
         commandLine.pop()
 
-    #if rename:
-    #    commandLine.insert(2,"-r")
+    if rename:
+        commandLine.insert(2,"-r")
 
     try:
-        result = subprocess.check_output(commandLine, stderr=subprocess.PIPE) 
+        result = subprocess.check_output(commandLine, stderr=subprocess.PIPE)
     except:
         commandLine[0] = altCommand
-        result = subprocess.check_output(commandLine, stderr=subprocess.PIPE) 
+        result = subprocess.check_output(commandLine, stderr=subprocess.PIPE)
     return result
     
 

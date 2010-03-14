@@ -30,15 +30,27 @@ def main(options, args):
     hn = HeaderNormalizer()
     candidates = hn.find_files_containing_headers(args.searchdir)
     matches = []
-    for file in candidates:
+
+    # Copy the list because you are removing bad candidates and if
+    # you modify the list while it is driving the loop you'll get
+    # unexpected results due to python's internal indexer.
+    for file in candidates[:]:
         matches = hn.find_header_in_file(args.header_filename, file)
         if( len(matches) > 1):
             print("Found %d matches in %s" % (len(matches),file))
         elif( len(matches) == 1):
             print("Found %d match in %s" % (len(matches),file))
+        else:
+            candidates.remove(file)
+
         for m in matches:
             print( "\tStart %d End %d\t\t Data %s" %(m.start,m.end,m.string))
             print()
+
+    if options.do_rename:
+        for file in candidates:
+            print( "Renaming to use %s in %s" %(args.header_filename, file))
+            hn.rename_headers_in_file(args.header_filename, file)
 
 
 def handle_cmdline():

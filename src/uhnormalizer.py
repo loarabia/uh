@@ -82,6 +82,7 @@ class HeaderNormalizer:
         the line in the file contains just the include. Any extra space or
         other not include statement data on the line will be removed.
         """
+        print("Renaming Header" + header)
         matches = self.find_header_in_file(header, file)
         patternString = bytes("#include \""+header+"\"","utf_8")# + os.linesep
 
