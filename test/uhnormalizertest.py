@@ -8,7 +8,7 @@
 # <author> Larry Olson </author>
 # <date> 2.17.2010 </date>
 # <summary> 
-# Tests the uh option parsing and commandline handling.
+# Tests the uhnormalizer library functions for finding and replacing headers.
 # </summary>
 #-----------------------------------------------------------------------------
 
