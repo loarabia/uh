@@ -19,8 +19,7 @@ from uhnormalizer import HeaderNormalizer
 
 USAGE = \
 """
-\tWindows: python %prog [options] headerFileName [dir]
-\t*NIX: %prog [options] headerFileName [dir] """
+\t%prog [options] headerFileName [dir] """
 
 NO_ERROR = 0
 BAD_ARGS = 1
