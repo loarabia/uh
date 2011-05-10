@@ -125,7 +125,7 @@ class Test_Main(unittest.TestCase):
         self.assertNotEqual(output , b"")
 
         output_lines = output.split(bytes(os.linesep,"utf_8"))
-        self.assertEquals( len(output_lines) , 7 )
+        self.assertEqual( len(output_lines) , 7 )
 
         #matchStr = bytes( os.path.join("fakeproject","test.c"),"utf_8")
         # fakeproject/test.c
@@ -168,6 +168,17 @@ class Test_Main(unittest.TestCase):
         self.assertEqual( re.search(oldPattern, newContents), None)
         self.assertNotEqual( re.search(newPattern, newContents), None)
 
+def runNativeTool(header_file, search_dir=None, rename=False):
+    """
+    This runs the native version of the command and returns the output string.
+    """
+    tool = os.oath.join("..","src","uh")
+
+    commandLine = [tool, header_file, search_dir]
+    assrt(commandLine != None)
+    commandLine = fixupCommandLine(commandLine, header_file, search_dir)
+    assrt(commandLine != None)
+    return runCommandLine(commandLine, "")
 
 def runTool(header_file, search_dir=None, rename=False):
     """
@@ -181,19 +192,25 @@ def runTool(header_file, search_dir=None, rename=False):
     tool = os.path.join("..","src","uh.py")
 
     commandLine = [command, tool, header_file, search_dir]
+    commandLine = fixupCommandLine(commandLine, search_dir, rename)
+    return runCommandLine(commandLine, altCommand)
+
+def fixupCommandLine(command_line, search_dir, rename):
     if search_dir == None:
-        commandLine.pop()
-
-    if rename:
-        commandLine.insert(2,"-r")
-
-    try:
-        result = subprocess.check_output(commandLine, stderr=subprocess.PIPE)
-    except:
-        commandLine[0] = altCommand
-        result = subprocess.check_output(commandLine, stderr=subprocess.PIPE)
-    return result
+        command_line.pop()
     
+    if rename:
+        command_line.insert(2,"-r")
+
+    return command_line
+
+def runCommandLine(command_line, altCommand):
+    try:
+        result = subprocess.check_output(command_line, stderr=subprocess.PIPE)
+    except:
+        command_line[0] = altCommand
+        result = subprocess.check_output(command_line, stderr=subprocess.PIPE)
+    return result
 
 class TestOptions:
     """
