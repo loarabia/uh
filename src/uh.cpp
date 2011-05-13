@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 
+#include "IncludeHandler.h"
+
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/Path.h"
@@ -23,23 +25,6 @@
 
 
 using namespace llvm;
-
-class IncludeCallbackHandler: public clang::PPCallbacks
-{
-public:
-    virtual void InclusionDirective(
-                clang::SourceLocation hashMarkLocation,
-                const clang::Token &includeToken,
-                StringRef fileName,
-                bool isAngled,
-                const clang::FileEntry *file,
-                clang::SourceLocation endLocation,
-                StringRef searchPath,
-                StringRef relativePath)
-    {
-        std::cout << fileName.str() << std::endl;
-    }
-};
 
 /*
  * If this flag is specified, the tool will actually rename and headers that
@@ -117,7 +102,10 @@ std::set<sys::Path> FindFilesContainingHeaders()
         ci.createPreprocessor();
         ci.createASTContext();
         clang::Preprocessor &pp = ci.getPreprocessor();
-        IncludeCallbackHandler *includeHandler = new IncludeCallbackHandler();
+        clang::SourceManager &sm = ci.getSourceManager();
+        uh::IncludeHandler *includeHandler = new uh::IncludeHandler(
+            ci.getSourceManager(),
+            *childIterator);
         pp.addPPCallbacks(includeHandler);
         ci.setPreprocessor(&pp);
 
@@ -129,8 +117,7 @@ std::set<sys::Path> FindFilesContainingHeaders()
             hsos,
             lOpts,
             pti->getTriple());
-        std::cout << (*childIterator).str() << std::endl;
-        ci.getSourceManager().clearIDTables();
+        
         ci.InitializeSourceManager( (*childIterator).str());
         ci.getDiagnosticClient().BeginSourceFile(lOpts, &pp);
         clang::ParseAST(pp , &astConsumer, ci.getASTContext());

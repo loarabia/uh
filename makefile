@@ -1,8 +1,8 @@
 CXXFLAGS := $(shell llvm-config --cxxflags)
 LLVMLDFLAGS := $(shell llvm-config --ldflags --libs)
-SOURCES = src/uh.cpp 
+SOURCES = src/uh.cpp \
+    src/IncludeHandler.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
-EXES = $(OBJECTS:.o=)
 CLANGLIBS = -lclangParse \
     -lclangSema \
     -lclangAnalysis \
@@ -15,7 +15,8 @@ CLANGLIBS = -lclangParse \
 	-lLLVMSupport \
 	-lLLVMSystem \
 
-all: $(OBJECTS) $(EXES)
+uh: $(OBJECTS) 
+	$(CXX) $(OBJECTS) $(CLANGLIBS) $(LLVMLDFLAGS) -o src/$@
 
 %: %.o
 	$(CXX) -o $@ $< $(CLANGLIBS) $(LLVMLDFLAGS)
