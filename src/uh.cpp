@@ -81,36 +81,40 @@ std::set<sys::Path> FindFilesContainingHeaders()
         std::cout << (*childIterator).str() << std::endl;
     }
 
+    clang::CompilerInstance ci;
+
+    clang::HeaderSearchOptions hsos = ci.getHeaderSearchOpts();
+    hsos.AddPath(SearchDir, clang::frontend::Quoted, false, false, false); 
+    hsos.AddPath("/Users/loarabia/Code/uh/test/scenarios/fakeproject", clang::frontend::Quoted,
+        false, false, false);
+
+    ci.createFileManager();
+    ci.createDiagnostics(0, NULL);
+
+    clang::TargetOptions to;
+    to.Triple = llvm::sys::getHostTriple();
+    clang::TargetInfo *pti = clang::TargetInfo::CreateTargetInfo(ci.getDiagnostics(), to);
+    ci.setTarget(pti);
+
+    clang::ASTConsumer astConsumer;
+    clang::LangOptions lOpts;
+
     for( childIterator = childPaths.begin(); childIterator != childPaths.end(); childIterator++)
     {
-        clang::CompilerInstance ci;
-
-        clang::HeaderSearchOptions hsos = ci.getHeaderSearchOpts();
-        hsos.AddPath(SearchDir, clang::frontend::Quoted, false, false, false); 
-        hsos.AddPath("/Users/loarabia/Code/uh/test/scenarios/fakeproject", clang::frontend::Quoted,
-            false, false, false);
-        ci.createFileManager();
-        ci.createDiagnostics(0, NULL);
         ci.createSourceManager(ci.getFileManager());
-
-        clang::TargetOptions to;
-        to.Triple = llvm::sys::getHostTriple();
-        clang::TargetInfo *pti = clang::TargetInfo::CreateTargetInfo(ci.getDiagnostics(), to);
-        ci.setTarget(pti);
-
+        clang::SourceManager &sm = ci.getSourceManager();
 
         ci.createPreprocessor();
-        ci.createASTContext();
         clang::Preprocessor &pp = ci.getPreprocessor();
-        clang::SourceManager &sm = ci.getSourceManager();
+
+        ci.createASTContext();
+        
         uh::IncludeHandler *includeHandler = new uh::IncludeHandler(
             ci.getSourceManager(),
             *childIterator);
+
         pp.addPPCallbacks(includeHandler);
         ci.setPreprocessor(&pp);
-
-        clang::ASTConsumer astConsumer;
-        clang::LangOptions lOpts;
 
         clang::ApplyHeaderSearchOptions(
             pp.getHeaderSearchInfo(),
@@ -126,13 +130,12 @@ std::set<sys::Path> FindFilesContainingHeaders()
 }
 
 /*
- * recurseDirectories - Implements the "R" modifier. This function scans through
+ * recurseDirectories - This function scans through
  * the Paths vector and replaces any directories it
  * finds with all the files in that directory (recursively). It uses the
  * sys::Path::getDirectoryContent method to perform the actual directory scans.
  */
-bool
-recurseDirectories(const sys::Path& path,
+bool recurseDirectories(const sys::Path& path,
                    std::set<sys::Path>& result,
                    std::string* ErrMsg)
 {
