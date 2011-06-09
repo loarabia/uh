@@ -59,18 +59,36 @@ class HeaderNormalizer:
 
         # Work in Binary mode to bypass the tweaking of newlines that python
         # does on Windows
-        fd = open(file,"rb")
-        contents = fd.read()
-        fd.close()
+        with open(file,"rb") as fd:
+            contents = fd.read()
 
-        patternString = "#include\s+\""+header+"\"" 
-        patternBytes = bytes(patternString,"utf_8")
-        pattern = re.compile(patternBytes, re.IGNORECASE )
-        matches = pattern.finditer(contents)
+            patternBytes = bytes("#include\s+\""+header+"\"" ,"utf_8")
+            pattern = re.compile(patternBytes, re.IGNORECASE )
+            matches = pattern.finditer(contents)
 
-        for m in matches:
-            matchesData.append( MatchData(m.start(), m.end(), m.group(0)))
-
+            patternBytes = bytes(r"[\r\b]+", "utf_8")
+            pattern = re.compile(patternBytes, re.IGNORECASE)
+            eolMatches = pattern.finditer(contents)
+      
+            # find the line number of the matches and puth them in an easier to maniupate state
+            newLinePos = -1 
+            prevNewLinePos = -1
+            lineNum = 0 
+            eolMatch = None
+            for m in matches:
+                while newLinePos < m.start():
+                    try:
+                        prevNewLinePos = newLinePos 
+                        eolMatch = next(eolMatches)
+                        newLinePos = eolMatch.end()
+                        lineNum += 1
+                    except StopIteration:
+                        lineNum += 1
+                        break
+                if eolMatch.start() > m.start():
+                    newLinePos = prevNewLinePos
+                    
+                matchesData.append( MatchData(lineNum, newLinePos, m.start(), m.end(), m.group(0)))
         return matchesData 
 
     def rename_headers_in_file(self, header, file):
@@ -86,22 +104,34 @@ class HeaderNormalizer:
         matches = self.find_header_in_file(header, file)
         patternString = bytes("#include \""+header+"\"","utf_8")# + os.linesep
 
-        fd = open(file, "rb+")
+        with open(file, "rb+") as fd:
 
-        for m in matches:
-            fd.seek(m.start)
-            fd.write(patternString)
-            # pad out the rest of the line
-            while fd.tell() < m.end:
-                fd.write(b" ")
-
-        fd.close()
-
+            for m in matches:
+                fd.seek(m.start)
+                fd.write(patternString)
+                # pad out the rest of the line
+                while fd.tell() < m.end:
+                    fd.write(b" ")
 
 class MatchData:
 
-    def __init__(self, start, end, string):
+    def __init__(self, line, lineOffset, start, end, string):
+        assert(line >= 0) 
+        #assert(lineOffset >= 0) 
+        assert(start >= 0) 
+        assert(end >= 0) 
+        assert(end - start >= 0) 
+        self.line = line
+        self.lineOffset = lineOffset
         self.start = start
         self.end = end
         self.string = string
         self.length = end - start
+        assert(self.start - self.lineOffset >= 0) 
+        self.col = self.start - self.lineOffset
+        assert(self.line >= 0) 
+        #assert(self.lineOffset >= 0) 
+        assert(self.start >= 0) 
+        assert(self.end >= 0) 
+        assert(self.length >= 0) 
+        assert(self.col >= 0) 

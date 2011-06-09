@@ -43,7 +43,7 @@ def main(options, args):
             candidates.remove(file)
 
         for m in matches:
-            print( "\tStart %d End %d\t\t Data %s" %(m.start,m.end,m.string))
+            print( "\tLine %d Start %d End %d\t\t Data %s" %(m.line, m.col, m.col+m.length, m.string))
             print()
 
     if options.do_rename:

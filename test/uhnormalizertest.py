@@ -78,6 +78,7 @@ class Test_HeaderNormalizer(unittest.TestCase):
         self.assertEquals(matches[0].end, 52)
         self.assertEquals(matches[0].length, 24)
         self.assertEquals(matches[0].string, b"#include \"rootInclude.H\"")
+        self.assertEquals(matches[0].line, 2)
 
         matches = hn.find_header_in_file(header,file2)
         self.assertEquals(len(matches), 1)
@@ -86,6 +87,7 @@ class Test_HeaderNormalizer(unittest.TestCase):
         self.assertEquals(matches[0].end, 24)
         self.assertEquals(matches[0].length, 24)
         self.assertEquals(matches[0].string, b"#include \"rootInclude.h\"")
+        self.assertEquals(matches[0].line, 1)
 
     def test_find_header_in_file_include_multiple(self):
         hn = HeaderNormalizer()
@@ -94,12 +96,13 @@ class Test_HeaderNormalizer(unittest.TestCase):
         file = join("scenarios","fakeproject","test.c")
 
         matches = hn.find_header_in_file(header,file)
-
         self.assertEquals(len(matches),2)
         self.assertEquals(matches[0].string, b"#include \"header1.H\"")
         self.assertEquals(matches[0].start, 26)
+        self.assertEquals(matches[0].line, 2)
         self.assertEquals(matches[1].string, b"#include \"header1.h\"")
         self.assertEquals(matches[1].start, 98)
+        self.assertEquals(matches[1].line, 5)
 
     def test_rename_headers_in_file(self):
         header = "header1.h"
@@ -117,8 +120,10 @@ class Test_HeaderNormalizer(unittest.TestCase):
         self.assertEquals(len(matches),2)
         self.assertEquals(matches[0].string, b"#include \"header1.h\"")
         self.assertEquals(matches[0].start, 26)
+        self.assertEquals(matches[0].line, 2)
         self.assertEquals(matches[1].string, b"#include \"header1.h\"")
         self.assertEquals(matches[1].start, 98)
+        self.assertEquals(matches[1].line, 5)
 
     def test_rename_headers_in_file_extra_spaces(self):
         header = "aaaaaaaaaa.h"
@@ -130,10 +135,16 @@ class Test_HeaderNormalizer(unittest.TestCase):
         hn = HeaderNormalizer() 
         matches = hn.find_header_in_file(header,fileCopy)
         self.assertEquals(len(matches),1)
+        self.assertEquals(matches[0].line, 6)
+        self.assertEquals(matches[0].col + matches[0].length, 29)
+        self.assertEquals(matches[0].col, 1)
     
         hn.rename_headers_in_file(header, fileCopy)
         matches = hn.find_header_in_file(header, fileCopy)
         self.assertEquals(len(matches),1)
+        self.assertEquals(matches[0].line, 6)
+        self.assertEquals(matches[0].col + matches[0].length, 24)
+        self.assertEquals(matches[0].col, 1)
        
         # check that the include line doesn't have any extra cruft
         tfd = open(fileCopy, "rb")

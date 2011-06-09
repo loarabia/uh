@@ -117,7 +117,7 @@ class Test_Main(unittest.TestCase):
         #matchStr = bytes(os.path.join("source","test.c"),"utf_8")
         matchStr = b"source.test\.c"
         self.assertNotEqual( re.search(matchStr ,output_lines[0]) ,None) 
-        self.assertTrue(re.search(b"Start 28 End 52", output_lines[1]) != None)
+        self.assertTrue(re.search(b"Start 1 End 25", output_lines[1]) != None)
 
 
     def test_header_filename(self):
@@ -131,13 +131,13 @@ class Test_Main(unittest.TestCase):
         # fakeproject/test.c
         matchStr = b"fakeproject.test\.c"
         self.assertNotEqual(re.search(matchStr,output_lines[0]), None) 
-        self.assertNotEqual(re.search(b"Start 0 End 24", output_lines[1]),None)
+        self.assertNotEqual(re.search(b"Start 1 End 25", output_lines[1]),None)
 
         #matchStr = bytes(os.path.join("source","test.c"),"utf_8")
         # source/test.c
         matchStr = b"source.test\.c"
         self.assertNotEqual(re.search(matchStr, output_lines[3]),  None) 
-        self.assertNotEqual(re.search(b"Start 28 End 52",output_lines[4]),None)
+        self.assertNotEqual(re.search(b"Start 1 End 25",output_lines[4]),None)
 
 
     def test_do_rename(self):
