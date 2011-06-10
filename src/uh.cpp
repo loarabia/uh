@@ -111,7 +111,8 @@ std::set<sys::Path> FindFilesContainingHeaders()
         
         uh::IncludeHandler *includeHandler = new uh::IncludeHandler(
             ci.getSourceManager(),
-            *childIterator);
+            *childIterator,
+            Filename);
 
         pp.addPPCallbacks(includeHandler);
         ci.setPreprocessor(&pp);
@@ -139,7 +140,8 @@ bool recurseDirectories(const sys::Path& path,
                    std::set<sys::Path>& result,
                    std::string* ErrMsg)
 {
-    llvm::Regex candidateRegEx(".[hHcC][pP]?[pP]?");
+    //llvm::Regex candidateRegEx(".[hHcC][pP]?[pP]?");
+    llvm::Regex candidateRegEx(".[hc]p?p?",llvm::Regex::IgnoreCase);
     llvm::SmallVector<StringRef,1> matches;
 
     result.clear();

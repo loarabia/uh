@@ -8,6 +8,7 @@
 
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Path.h"
+#include "llvm/Support/Regex.h"
 
 using namespace clang;
 
@@ -18,12 +19,16 @@ namespace uh
         SourceManager &sm;
         llvm::sys::Path fileBeingParsed;
         int includesFoundInFile;
+        llvm::Regex headerRegex;
+        llvm::StringRef headerFilename;
 
         public:
-            IncludeHandler( SourceManager &srcMgr, llvm::sys::Path file) :
+            IncludeHandler( SourceManager &srcMgr, llvm::sys::Path file, std::string &header) :
                 sm(srcMgr),
                 fileBeingParsed(file),
-                includesFoundInFile(0)
+                includesFoundInFile(0),
+                headerRegex(header, llvm::Regex::IgnoreCase),
+                headerFilename(header)
                 {
                 }
 
