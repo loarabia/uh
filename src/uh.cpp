@@ -169,7 +169,7 @@ bool recurseDirectories(const sys::Path& path,
                     sys::Path p = *II;
                     StringRef pString(p.str());
                     StringRef ext = sys::path::extension(pString);
-                    if(candidateRegEx.match(ext))
+                    if(ext.size() > 0 && candidateRegEx.match(ext))
                     {
                         result.insert(*II);
                     }
