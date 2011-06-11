@@ -59,6 +59,10 @@ int main( int argc, char **argv)
 {
 	cl::ParseCommandLineOptions(argc, argv,
 		"Finds inconsistently named headers and shows their location.");
+    if( SearchDir.empty())
+    {
+        SearchDir = sys::Path::GetCurrentDirectory().str();
+    }
     FindFilesContainingHeaders();
 }
 
