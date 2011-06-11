@@ -176,7 +176,13 @@ bool recurseDirectories(const sys::Path& path,
                     
                 }
             } else {
-                result.insert(*I);
+                sys::Path p = *I;
+                StringRef pString(p.str());
+                StringRef ext = sys::path::extension(pString);
+                if(ext.size() > 0 && candidateRegEx.match(ext))
+                {
+                    result.insert(*I);
+                }
             }
         }
     return false;
