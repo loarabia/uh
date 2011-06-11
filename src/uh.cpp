@@ -141,7 +141,7 @@ bool recurseDirectories(const sys::Path& path,
                    std::string* ErrMsg)
 {
     //llvm::Regex candidateRegEx(".[hHcC][pP]?[pP]?");
-    llvm::Regex candidateRegEx(".[hc]p?p?",llvm::Regex::IgnoreCase);
+    llvm::Regex candidateRegEx("\\.[hc]p?p?",llvm::Regex::IgnoreCase);
     llvm::SmallVector<StringRef,1> matches;
 
     result.clear();
