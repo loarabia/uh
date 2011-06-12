@@ -168,16 +168,49 @@ class Test_Main(unittest.TestCase):
         self.assertEqual( re.search(oldPattern, newContents), None)
         self.assertNotEqual( re.search(newPattern, newContents), None)
 
+class Test_NativeMain(unittest.TestCase):
+
+    def test_optional_dir(self):
+        search_dir = os.path.join("scenarios","fakeproject","source")
+
+        output = runNativeTool("rootInclude.h",search_dir)
+        self.assertTrue(output != b"")
+
+        output_lines = output.split(bytes(os.linesep,"utf_8"))
+        self.assertEquals( len(output_lines), 4)
+
+        #matchStr = bytes(os.path.join("source","test.c"),"utf_8")
+        matchStr = b"source.test\.c"
+        self.assertNotEqual( re.search(matchStr, output_lines[0]), None) 
+
+    def test_header_filename(self):
+        output = runTool("rootInclude.h")
+        self.assertNotEqual(output , b"")
+
+        output_lines = output.split(bytes(os.linesep,"utf_8"))
+        self.assertEqual( len(output_lines) , 7 )
+
+        #matchStr = bytes( os.path.join("fakeproject","test.c"),"utf_8")
+        # fakeproject/test.c
+        matchStr = b"fakeproject.test\.c"
+        self.assertNotEqual(re.search(matchStr,output_lines[0]), None) 
+        self.assertNotEqual(re.search(b"Start 1 End 25", output_lines[1]),None)
+
+        #matchStr = bytes(os.path.join("source","test.c"),"utf_8")
+        # source/test.c
+        matchStr = b"source.test\.c"
+        self.assertNotEqual(re.search(matchStr, output_lines[3]),  None) 
+
 def runNativeTool(header_file, search_dir=None, rename=False):
     """
     This runs the native version of the command and returns the output string.
     """
-    tool = os.oath.join("..","src","uh")
+    tool = os.path.join("..","src","uh")
 
     commandLine = [tool, header_file, search_dir]
-    assrt(commandLine != None)
-    commandLine = fixupCommandLine(commandLine, header_file, search_dir)
-    assrt(commandLine != None)
+    assert(commandLine != None)
+    commandLine = fixupCommandLine(commandLine, search_dir, rename)
+    assert(commandLine != None)
     return runCommandLine(commandLine, "")
 
 def runTool(header_file, search_dir=None, rename=False):

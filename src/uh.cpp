@@ -80,10 +80,12 @@ std::set<sys::Path> FindFilesContainingHeaders()
     recurseDirectories(searchPath, childPaths, errorMsg);
     std::set<sys::Path>::iterator childIterator;
 
+    /*
     for( childIterator = childPaths.begin(); childIterator != childPaths.end(); childIterator++)
     {
         std::cout << (*childIterator).str() << std::endl;
     }
+    */
 
     clang::CompilerInstance ci;
 
