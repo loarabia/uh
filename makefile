@@ -3,7 +3,8 @@ LLVMLDFLAGS := $(shell llvm-config --ldflags --libs)
 SOURCES = src/uh.cpp \
     src/IncludeHandler.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
-CLANGLIBS = -lclangParse \
+CLANGLIBS = -lclangRewrite \
+    -lclangParse \
     -lclangSema \
     -lclangAnalysis \
     -lclangAST \

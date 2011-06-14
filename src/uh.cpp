@@ -22,13 +22,14 @@
 #include "clang/AST/ASTConsumer.h"
 #include "clang/Basic/TargetOptions.h"
 #include "clang/Basic/TargetInfo.h"
+#include "clang/Rewrite/Rewriter.h"
 
 
 using namespace llvm;
 
 /*
- * If this flag is specified, the tool will actually rename and headers that
- * match the specified header. The fefault value is false, which just causes
+ * If this flag is specified, the tool will actually rename any headers that
+ * match the specified header. The default value is false, which just causes
  * the tool to print where a header was found.
  */ 
 static cl::opt<bool>        Rename(
@@ -109,6 +110,7 @@ std::set<sys::Path> FindFilesContainingHeaders()
     {
         ci.createSourceManager(ci.getFileManager());
         clang::SourceManager &sm = ci.getSourceManager();
+        clang::Rewriter rw(sm, lOpts);
 
         ci.createPreprocessor();
         clang::Preprocessor &pp = ci.getPreprocessor();
@@ -118,7 +120,9 @@ std::set<sys::Path> FindFilesContainingHeaders()
         uh::IncludeHandler *includeHandler = new uh::IncludeHandler(
             ci.getSourceManager(),
             *childIterator,
-            Filename);
+            Filename,
+            rw,
+            Rename);
 
         pp.addPPCallbacks(includeHandler);
         ci.setPreprocessor(&pp);

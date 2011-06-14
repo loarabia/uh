@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "IncludeHandler.h"
+#include "llvm/Support/raw_ostream.h"
 
 using namespace uh;
 
@@ -35,5 +36,28 @@ void IncludeHandler::InclusionDirective(SourceLocation hashLoc,
              std::cout << loc.getLine();
              std::cout << " ";
              std::cout << filename.str() << std::endl;
+             if ( rewrite )
+             {
+                 bool result = rewriter.ReplaceText(endLoc.getFileLocWithOffset(1),
+                    filename.size(),
+                    headerFilename);
+
+                 for (Rewriter::buffer_iterator I = rewriter.buffer_begin(),
+                      E = rewriter.buffer_end();
+                      I != E;
+                      ++I)
+                 {
+                      const FileEntry *fe = rewriter.getSourceMgr().getFileEntryForID(I->first);
+                      std::string Filename = fe->getName();
+                      std::string Err;
+                      llvm::raw_fd_ostream OS(Filename.c_str(), Err,
+                                              llvm::raw_fd_ostream::F_Binary);
+                      if (!Err.empty()) {
+                      }
+                      RewriteBuffer &RewriteBuf = I->second;
+                      RewriteBuf.write(OS);
+                      OS.flush();
+                 }
+             }
         }
 }

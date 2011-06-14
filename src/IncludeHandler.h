@@ -4,6 +4,7 @@
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Basic/SourceLocation.h"
+#include "clang/Rewrite/Rewriter.h"
 #include "clang/Lex/PPCallbacks.h"
 
 #include "llvm/ADT/StringRef.h"
@@ -21,14 +22,22 @@ namespace uh
         int includesFoundInFile;
         llvm::Regex headerRegex;
         llvm::StringRef headerFilename;
+        clang::Rewriter rewriter;
+        bool rewrite;
 
         public:
-            IncludeHandler( SourceManager &srcMgr, llvm::sys::Path file, std::string &header) :
+            IncludeHandler( SourceManager &srcMgr,
+                            llvm::sys::Path file, 
+                            std::string &header,
+                            clang::Rewriter &rw,
+                            bool rewrite) :
                 sm(srcMgr),
                 fileBeingParsed(file),
                 includesFoundInFile(0),
                 headerRegex(header, llvm::Regex::IgnoreCase),
-                headerFilename(header)
+                headerFilename(header),
+                rewriter(rw),
+                rewrite(rewrite)
                 {
                 }
 
