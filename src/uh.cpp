@@ -47,6 +47,9 @@ static cl::opt<std::string> SearchDir(
 								cl::desc("[searchDir]"),
 								cl::init(""));
 
+static cl::list<std::string> IncludeDirs(
+                                cl::Positional,
+                                cl::desc("[includeDir]"));
 /*
  * FORWARD DECLARATIONS
  */
@@ -92,8 +95,12 @@ std::set<sys::Path> FindFilesContainingHeaders()
 
     clang::HeaderSearchOptions hsos = ci.getHeaderSearchOpts();
     hsos.AddPath(SearchDir, clang::frontend::Quoted, false, false, false); 
-    hsos.AddPath("/Users/loarabia/Code/uh/test/scenarios/fakeproject", clang::frontend::Quoted,
-        false, false, false);
+    //hsos.AddPath("/Users/loarabia/Code/uh/test/scenarios/fakeproject", clang::frontend::Quoted,
+    //    false, false, false);
+    for( int i = 0, e = IncludeDirs.size(); i != e; ++i)
+    {
+        hsos.AddPath( IncludeDirs[i], clang::frontend::Quoted, false, false,false);
+    }
 
     ci.createFileManager();
     ci.createDiagnostics(0, NULL);
