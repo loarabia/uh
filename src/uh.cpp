@@ -1,8 +1,10 @@
-#include <iostream>
+/******************************************************************************
+ * Copyright 2011 Larry Olson
+ *****************************************************************************/
 #include <string>
-#include <vector>
+#include <set>
 
-#include "IncludeHandler.h"
+#include "./IncludeHandler.h"
 
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/CommandLine.h"
@@ -17,72 +19,85 @@
 #include "clang/Lex/PreProcessor.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Lex/HeaderSearch.h"
-#include "clang/Basic/FileManager.h"
 #include "clang/Parse/ParseAST.h"
 #include "clang/AST/ASTConsumer.h"
 #include "clang/Basic/TargetOptions.h"
 #include "clang/Basic/TargetInfo.h"
 #include "clang/Rewrite/Rewriter.h"
 
+using llvm::cl::opt;
+using llvm::cl::desc;
+using llvm::cl::init;
+using llvm::cl::Positional;
+using llvm::cl::Required;
+using llvm::cl::list;
+using llvm::cl::ParseCommandLineOptions;
 
-using namespace llvm;
+using llvm::sys::Path;
+using llvm::sys::PathWithStatus;
+using llvm::sys::FileStatus;
+using llvm::sys::path::extension;
+
+using llvm::StringRef;
+
+using clang::CompilerInstance;
+using clang::TargetInfo;
 
 /*
  * If this flag is specified, the tool will actually rename any headers that
  * match the specified header. The default value is false, which just causes
  * the tool to print where a header was found.
  */ 
-static cl::opt<bool>        Rename(
-								"rename",
-								cl::desc("Renames any headers found"),
-								cl::init(false));
+static opt<bool>        Rename(
+                               "rename",
+                               desc("Renames any headers found"),
+                               init(false));
 
-static cl::opt<std::string> Filename(
-								cl::Positional,
-								cl::desc("headerFilename"),
-								cl::Required);
+static opt<std::string> Filename(
+                               Positional,
+                               desc("headerFilename"),
+                               Required);
 
-static cl::opt<std::string> SearchDir(
-								cl::Positional,
-								cl::desc("[searchDir]"),
-								cl::init(""));
+static opt<std::string> SearchDir(
+                               Positional,
+                               desc("[searchDir]"),
+                               init(""));
 
-static cl::list<std::string> IncludeDirs(
-                                cl::Positional,
-                                cl::desc("[includeDir]"));
+// using llvm's list.
+static list<std::string> IncludeDirs(
+                               Positional,
+                               desc("[includeDir]"));
 /*
  * FORWARD DECLARATIONS
  */
-std::set<sys::Path> FindFilesContainingHeaders();
-bool recurseDirectories(const sys::Path&, std::set<sys::Path>&, std::string*);
+void FindFilesContainingHeaders();
+bool recurseDirectories(const Path&, std::set<Path>&, std::string*);
 
 /*
  * main 
  */
-int main( int argc, char **argv)
-{
-	cl::ParseCommandLineOptions(argc, argv,
-		"Finds inconsistently named headers and shows their location.");
-    if( SearchDir.empty())
-    {
-        SearchDir = sys::Path::GetCurrentDirectory().str();
+int main(int argc, char **argv) {
+    ParseCommandLineOptions(argc, argv,
+        "Finds inconsistently named headers and shows their location.");
+    if ( SearchDir.empty() ) {
+        SearchDir = Path::GetCurrentDirectory().str();
     }
     FindFilesContainingHeaders();
+    return 0;
 }
 
 /*
  * FindFilesContainingHeaders
  */
-std::set<sys::Path> FindFilesContainingHeaders()
-{
+void FindFilesContainingHeaders() {
     std::set<std::string> candidateFiles;
-    sys::Path searchPath(SearchDir);
+    Path searchPath(SearchDir);
 
-    std::set<sys::Path> childPaths;
+    std::set<Path> childPaths;
     std::string *errorMsg;
 
     recurseDirectories(searchPath, childPaths, errorMsg);
-    std::set<sys::Path>::iterator childIterator;
+    std::set<Path>::iterator childIterator;
 
     /*
     for( childIterator = childPaths.begin(); childIterator != childPaths.end(); childIterator++)
@@ -94,12 +109,15 @@ std::set<sys::Path> FindFilesContainingHeaders()
     clang::CompilerInstance ci;
 
     clang::HeaderSearchOptions hsos = ci.getHeaderSearchOpts();
-    hsos.AddPath(SearchDir, clang::frontend::Quoted, false, false, false); 
-    //hsos.AddPath("/Users/loarabia/Code/uh/test/scenarios/fakeproject", clang::frontend::Quoted,
-    //    false, false, false);
-    for( int i = 0, e = IncludeDirs.size(); i != e; ++i)
-    {
-        hsos.AddPath( IncludeDirs[i], clang::frontend::Quoted, false, false,false);
+    hsos.AddPath(SearchDir, clang::frontend::Quoted, false, false, false);
+
+    for (int i = 0, e = IncludeDirs.size(); i != e; ++i) {
+        hsos.AddPath(
+            IncludeDirs[i],
+            clang::frontend::Quoted,
+            false,
+            false,
+            false);
     }
 
     ci.createFileManager();
@@ -107,14 +125,15 @@ std::set<sys::Path> FindFilesContainingHeaders()
 
     clang::TargetOptions to;
     to.Triple = llvm::sys::getHostTriple();
-    clang::TargetInfo *pti = clang::TargetInfo::CreateTargetInfo(ci.getDiagnostics(), to);
+    TargetInfo *pti = TargetInfo::CreateTargetInfo(ci.getDiagnostics(), to);
     ci.setTarget(pti);
 
     clang::ASTConsumer astConsumer;
     clang::LangOptions lOpts;
 
-    for( childIterator = childPaths.begin(); childIterator != childPaths.end(); childIterator++)
-    {
+    for (childIterator = childPaths.begin();
+         childIterator != childPaths.end();
+         childIterator++) {
         ci.createSourceManager(ci.getFileManager());
         clang::SourceManager &sm = ci.getSourceManager();
         clang::Rewriter rw(sm, lOpts);
@@ -123,7 +142,7 @@ std::set<sys::Path> FindFilesContainingHeaders()
         clang::Preprocessor &pp = ci.getPreprocessor();
 
         ci.createASTContext();
-        
+
         uh::IncludeHandler *includeHandler = new uh::IncludeHandler(
             ci.getSourceManager(),
             *childIterator,
@@ -139,8 +158,8 @@ std::set<sys::Path> FindFilesContainingHeaders()
             hsos,
             lOpts,
             pti->getTriple());
-        
-        ci.InitializeSourceManager( (*childIterator).str());
+
+        ci.InitializeSourceManager((*childIterator).str());
         ci.getDiagnosticClient().BeginSourceFile(lOpts, &pp);
         clang::ParseAST(pp , &astConsumer, ci.getASTContext());
         ci.getDiagnosticClient().EndSourceFile();
@@ -153,55 +172,48 @@ std::set<sys::Path> FindFilesContainingHeaders()
  * finds with all the files in that directory (recursively). It uses the
  * sys::Path::getDirectoryContent method to perform the actual directory scans.
  */
-bool recurseDirectories(const sys::Path& path,
-                   std::set<sys::Path>& result,
-                   std::string* ErrMsg)
-{
-    //llvm::Regex candidateRegEx(".[hHcC][pP]?[pP]?");
-    llvm::Regex candidateRegEx("\\.[hc]p?p?",llvm::Regex::IgnoreCase);
-    llvm::SmallVector<StringRef,1> matches;
+bool recurseDirectories(const Path& path,
+                   std::set<Path>& result,
+                   std::string* ErrMsg) {
+    // llvm::Regex candidateRegEx(".[hHcC][pP]?[pP]?");
+    llvm::Regex candidateRegEx("\\.[hc]p?p?", llvm::Regex::IgnoreCase);
+    llvm::SmallVector<StringRef, 1> matches;
 
     result.clear();
-    std::set<sys::Path> content;
+    std::set<Path> content;
     if (path.getDirectoryContents(content, ErrMsg))
         return true;
-    for (std::set<sys::Path>::iterator I = content.begin(), E = content.end();
+    for (std::set<Path>::iterator I = content.begin(), E = content.end();
          I != E;
-         ++I) 
-         {
+         ++I) {
              // Make sure it exists and is a directory
-             sys::PathWithStatus PwS(*I);
-             const sys::FileStatus *Status = PwS.getFileStatus(false, ErrMsg);
+             PathWithStatus PwS(*I);
+             const FileStatus *Status = PwS.getFileStatus(false, ErrMsg);
              if (!Status)
                 return true;
             if (Status->isDir) {
-                std::set<sys::Path> moreResults;
+                std::set<Path> moreResults;
                 if (recurseDirectories(*I, moreResults, ErrMsg))
                     return true;
-                for( std::set<sys::Path>::iterator II = moreResults.begin(),
+                for (std::set<Path>::iterator II = moreResults.begin(),
                     EE = moreResults.end();
                     II != EE;
-                    ++II)
-                {
-                    sys::Path p = *II;
+                    ++II) {
+                    Path p = *II;
                     StringRef pString(p.str());
-                    StringRef ext = sys::path::extension(pString);
-                    if(ext.size() > 0 && candidateRegEx.match(ext))
-                    {
+                    StringRef ext = extension(pString);
+                    if (ext.size() > 0 && candidateRegEx.match(ext)) {
                         result.insert(*II);
                     }
-                    
                 }
             } else {
-                sys::Path p = *I;
+                Path p = *I;
                 StringRef pString(p.str());
-                StringRef ext = sys::path::extension(pString);
-                if(ext.size() > 0 && candidateRegEx.match(ext))
-                {
+                StringRef ext = extension(pString);
+                if (ext.size() > 0 && candidateRegEx.match(ext)) {
                     result.insert(*I);
                 }
             }
         }
     return false;
- }
- 
+}

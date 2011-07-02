@@ -172,9 +172,10 @@ class Test_NativeMain(unittest.TestCase):
 
     def test_optional_dir(self):
         search_dir = os.path.join("scenarios","fakeproject","source")
+        include_dir = os.path.join("scenarios","fakeproject")
 
-        output = runNativeTool("rootInclude.h",search_dir)
-        self.assertTrue(output != b"")
+        output = runNativeTool("rootInclude.h", search_dir, False, include_dir)
+        self.assertTrue(output != b'')
 
         output_lines = output.split(bytes(os.linesep,"utf_8"))
         self.assertEquals( len(output_lines), 4)
@@ -201,13 +202,13 @@ class Test_NativeMain(unittest.TestCase):
         matchStr = b"source.test\.c"
         self.assertNotEqual(re.search(matchStr, output_lines[3]),  None) 
 
-def runNativeTool(header_file, search_dir=None, rename=False):
+def runNativeTool(header_file, search_dir=None, rename=False, include_dir=None):
     """
     This runs the native version of the command and returns the output string.
     """
     tool = os.path.join("..","src","uh")
 
-    commandLine = [tool, header_file, search_dir]
+    commandLine = [tool, header_file, search_dir, include_dir]
     assert(commandLine != None)
     commandLine = fixupCommandLine(commandLine, search_dir, rename)
     assert(commandLine != None)

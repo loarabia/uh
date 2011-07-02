@@ -1,5 +1,10 @@
-#ifndef UH_INCLUDEHANDLER_H
-#define UH_INCLUDEHANDLER_H
+/******************************************************************************
+ * Copyright 2011 Larry Olson
+ *****************************************************************************/
+#ifndef SRC_INCLUDEHANDLER_H_
+#define SRC_INCLUDEHANDLER_H_
+
+#include <string>
 
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/SourceManager.h"
@@ -11,35 +16,36 @@
 #include "llvm/Support/Path.h"
 #include "llvm/Support/Regex.h"
 
-using namespace clang;
+using clang::PPCallbacks;
+using clang::SourceManager;
+using clang::Rewriter;
+using clang::SourceLocation;
+using clang::Token;
+using clang::FileEntry;
 
-namespace uh
-{
-    class IncludeHandler : public clang::PPCallbacks
-    {
-        SourceManager &sm;
+namespace uh {
+    class IncludeHandler : public PPCallbacks {
+        const SourceManager &sm;
         llvm::sys::Path fileBeingParsed;
         int includesFoundInFile;
         llvm::Regex headerRegex;
         llvm::StringRef headerFilename;
-        clang::Rewriter rewriter;
+        Rewriter rewriter;
         bool rewrite;
 
         public:
-            IncludeHandler( SourceManager &srcMgr,
-                            llvm::sys::Path file, 
-                            std::string &header,
-                            clang::Rewriter &rw,
-                            bool rewrite) :
+            IncludeHandler(const SourceManager &srcMgr,
+                           llvm::sys::Path file,
+                           std::string &header,
+                           Rewriter &rw,
+                           bool rewrite) :
                 sm(srcMgr),
                 fileBeingParsed(file),
                 includesFoundInFile(0),
                 headerRegex(header, llvm::Regex::IgnoreCase),
                 headerFilename(header),
                 rewriter(rw),
-                rewrite(rewrite)
-                {
-                }
+                rewrite(rewrite) { }
 
             void InclusionDirective(SourceLocation,
                                     const Token &,
@@ -51,4 +57,4 @@ namespace uh
                                     llvm::StringRef);
     };
 }
-#endif
+#endif  // SRC_INCLUDEHANDLER_H_

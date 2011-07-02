@@ -1,3 +1,9 @@
+ifeq ($(MAKECMDGOALS),analyze)
+CXXFLAGS := $(shell llvm-config --cxxflags) -analyze
+CXX := clang++
+endif
+
+EXE := uh
 CXXFLAGS := $(shell llvm-config --cxxflags)
 LLVMLDFLAGS := $(shell llvm-config --ldflags --libs)
 SOURCES = src/uh.cpp \
@@ -16,8 +22,11 @@ CLANGLIBS = -lclangRewrite \
 	-lLLVMSupport \
 	-lLLVMSystem \
 
-uh: $(OBJECTS) 
-	$(CXX) $(OBJECTS) $(CLANGLIBS) $(LLVMLDFLAGS) -o src/$@
+$(EXE): $(OBJECTS) 
+	$(CXX) $(OBJECTS) $(CLANGLIBS) $(LLVMLDFLAGS) -o src/$(EXE)
+
+analyze: $(OBJECTS)
+	$(CXX) $(OBJECTS) $(CLANGLIBS) $(LLVMLDFLAGS) -o src/$(EXE)
 
 %: %.o
 	$(CXX) -o $@ $< $(CLANGLIBS) $(LLVMLDFLAGS)

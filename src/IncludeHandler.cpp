@@ -1,9 +1,15 @@
+/******************************************************************************
+ * Copyright 2011 Larry Olson
+ *****************************************************************************/
+#include <string>
 #include <iostream>
 
-#include "IncludeHandler.h"
+#include "./IncludeHandler.h"
 #include "llvm/Support/raw_ostream.h"
 
-using namespace uh;
+using uh::IncludeHandler;
+using clang::PresumedLoc;
+using clang::RewriteBuffer;
 
 void IncludeHandler::InclusionDirective(SourceLocation hashLoc,
                                     const Token &includeTok,
@@ -12,12 +18,10 @@ void IncludeHandler::InclusionDirective(SourceLocation hashLoc,
                                     const FileEntry *file,
                                     SourceLocation endLoc,
                                     llvm::StringRef searchPath,
-                                    llvm::StringRef relativePath)
-{
-        if( (headerFilename.size() == filename.size()) && headerRegex.match(filename))
-        {
-             if( includesFoundInFile <= 0)
-             {
+                                    llvm::StringRef relativePath) {
+        if ((headerFilename.size() == filename.size())
+            && headerRegex.match(filename)) {
+             if (includesFoundInFile <= 0) {
                  std::cout << "Inside file:";
                  std::cout << fileBeingParsed.str() << std::endl;
                  std::cout << " found following includes:" << std::endl;
@@ -36,24 +40,24 @@ void IncludeHandler::InclusionDirective(SourceLocation hashLoc,
              std::cout << loc.getLine();
              std::cout << " ";
              std::cout << filename.str() << std::endl;
-             if ( rewrite )
-             {
-                 bool result = rewriter.ReplaceText(endLoc.getFileLocWithOffset(1),
+
+             if (rewrite) {
+                 bool result = rewriter.ReplaceText(
+                    endLoc.getFileLocWithOffset(1),
                     filename.size(),
                     headerFilename);
 
                  for (Rewriter::buffer_iterator I = rewriter.buffer_begin(),
-                      E = rewriter.buffer_end();
-                      I != E;
-                      ++I)
-                 {
-                      const FileEntry *fe = rewriter.getSourceMgr().getFileEntryForID(I->first);
+                     E = rewriter.buffer_end();
+                     I != E;
+                     ++I) {
+                     const FileEntry *fe =
+                          rewriter.getSourceMgr().getFileEntryForID(I->first);
                       std::string Filename = fe->getName();
                       std::string Err;
                       llvm::raw_fd_ostream OS(Filename.c_str(), Err,
                                               llvm::raw_fd_ostream::F_Binary);
-                      if (!Err.empty()) {
-                      }
+                      if (!Err.empty()) { }
                       RewriteBuffer &RewriteBuf = I->second;
                       RewriteBuf.write(OS);
                       OS.flush();
