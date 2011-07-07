@@ -20,7 +20,6 @@ CLANGLIBS = -lclangRewrite \
 	-lclangLex \
 	-lclangBasic \
 	-lLLVMSupport \
-	-lLLVMSystem \
 
 $(EXE): $(OBJECTS) 
 	$(CXX) $(OBJECTS) $(CLANGLIBS) $(LLVMLDFLAGS) -o src/$(EXE)
